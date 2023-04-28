@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cmath>
 #include <new>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -45,7 +47,7 @@ bool convientDSAT(int x, int c) // teste si la couleur c peut Ítre donnee au so
 void colorRR(int x, int k) // fonction recursive pour tester toutes les couleurs possible pour le sommet x
 {
     if (x == n) {
-        cout << "Coloration en " << k << " couleurs trouvÈe" << endl;
+        cout << "Coloration en " << k << " couleurs trouvé" << endl;
         for (int i = 0; i < n; i++) cout << "couleur de " << i << " : " << couleur1[i] << endl; //int z;cin >> z;
         trouve = true;
     } else
@@ -121,7 +123,7 @@ int DSATUR() {
     return cmax;
 }
 
-
+//DSATUR avec degre d'improprete (DSAT) et degre des sommets (Degre) pour le choix du sommet a colorier (dsatMax) et pour la mise a jour des DSAT
 int DSATUR(int k) {
     int nb = 0, c, x, cmax = 0;
     for (int i = 0; i < n; i++) {
@@ -133,19 +135,18 @@ int DSATUR(int k) {
         DSAT[i] = Degre[i];
     }
 
-    while (nb < n)  // tant qu'on a pas coloriÈ tous les sommets
+    while (nb < n)  // tant qu'on a pas colorié tous les sommets
     {
         c = 1;
-        x = dsatMax(); // on choisit le sommet de DSAT max non encore coloriÈ
+        x = dsatMax(); // on choisit le sommet de DSAT max non encore colorié
         while (!convientDSAT(x, c)) {
-
-            c++; // on cherche la plus petite couleur disponible pour ce sommet
-
+            if (c == k) c++; // si la couleur atteint le degré d'impropreté, on saute cette couleur
+            c++;
         }
-        for (int j = 0; j < n; j++) // mise ‡ jour des DSAT
+        for (int j = 0; j < n; j++) // mise à jour des DSAT
         {
             if (adj[x][j] && convientDSAT(j, c))
-                DSAT[j]++; // j n'avait aucun voisin coloriÈ c,on incrÈmente donc son DSAT
+                DSAT[j]++; // j n'avait aucun voisin colorié c,on incrémente donc son DSAT
         }
         couleur2[x] = c;
         if (cmax < c) cmax = c;
@@ -171,16 +172,54 @@ int degmoy() {
     return (moy / (n - 1));
 }
 
+int DSATUR2(int k) {
+    int nb = 0, c, x, cmax = 0;
+    for (int i = 0; i < n; i++) {
+        couleur2[i] = 0;
+        DSAT[i] = 0;
+        Degre[i] = 0;
+        for (int j = 0; j < n; j++)
+            if (adj[i][j]) Degre[i]++;
+        DSAT[i] = Degre[i];
+    }
+
+    while (nb < n) {  // tant qu'on a pas colorié tous les sommets
+        c = 1;
+        x = dsatMax(); // on choisit le sommet de DSAT max non encore colorié
+        while (!convientDSAT(x, c)) {
+            if (c == k) c++; // si la couleur atteint le degré d'impropreté, on saute cette couleur
+            c++;
+        }
+        for (int j = 0; j < n; j++) { // mise à jour des DSAT
+            if (adj[x][j] && convientDSAT(j, c)) {
+                int count = 0;
+                for (int l = 0; l < n; l++) {
+                    if (adj[j][l] && couleur2[l] == c) {
+                        count++;
+                    }
+                }
+                if (count < k) {
+                    DSAT[j]++; // j n'avait aucun voisin colorié c, on incrémente donc son DSAT
+                }
+            }
+        }
+        couleur2[x] = c;
+        if (cmax < c) cmax = c;
+        nb++;
+    }
+    return cmax;
+}
+
 
 int main() {
     int p, k, nbc;
-    const int N = 50;
-    cout << "Nombre de sommets" << endl;
-    //cin >> n;
-    n = 10;
-    cout << "Proba d'arÍte: " << endl;
-//    cin >> p;
-    p = 100;
+
+    srand(time(NULL));
+//    n = ::rand() % 100;
+//    p = ::rand() % 100;
+
+    n = 5;
+    p = 50;
 
     adj = new int *[n];
     for (int i = 0; i < n; i++)
@@ -192,6 +231,9 @@ int main() {
 
     genere(p);
 
+    cout << "N : " << n << endl;
+    cout << "P : " << p << endl;
+
 //    for (int i = 0; i < n; i++) {
 //        cout << "sommet " << i << " : ";
 //        for (int j = 0; j < n; j++)
@@ -199,18 +241,19 @@ int main() {
 //        cout << endl;
 //    }
 //
-//    k = DSATUR(0);
-//    cout << "DSAT: coloration en " << k << " couleurs : " << endl;
+    k = DSATUR(0);
+    cout << "DSAT : coloration en " << k << " couleurs : " << endl;
+    cout << "DSATUR2 : " << "Nombre de couleurs: " << DSATUR2(2) << endl;
+
 //    for (int i = 0; i  < n; i++)
 //        cout << "couleur de " << i << " : " << couleur2[i] << endl;
 //
 //    cout << "ColorExact :" << endl;
-//    nbc = nbChromatique(k);
-//    cout << "Nombre chromatique : " << nbc << endl;
+    nbc = nbChromatique(k);
+    cout << "Nombre chromatique : " << nbc << endl;
 
-    cout << "N : " << n << endl;
-    cout << "P : " << p << endl;
-    cout << "Degré moyen dans le graphe : [" << degmoy() << "]" << endl;
+
+//    cout << "Degré moyen dans le graphe : [" << degmoy() << "]" << endl;
 
 
     delete adj;
