@@ -1,22 +1,58 @@
+
+#ifndef PROJET_HPP
+#define PROJET_HPP
+
 #include <cstdlib>
 #include <iostream>
+#include <vector>
+#include <fstream>
 #include <cmath>
-#include <new>
-#include <cstdlib>
-#include <ctime>
 
 using namespace std;
 
+// VARIABLES GLOBALES
 int n; // nombre de sommets
 int **adj; //[n][n];  // matrice d'adjacence du graphe
-int *couleur1; //[n];  // couleurs des sommets pour l'agorithme exact
+int *couleur1; //[n];  // couleurs des sommets pour l'algorithme exact
 int *couleur2; //[n]; // couleurs pour DSATUR
-int *DSAT; //[n]; // degrÈs de saturation
-int *Degre; //[n]; // degrÈs des sommets
-bool trouve = false; // permet de stopper l'algorithme exact quand une coloration  a ete trouvee
+int *DSAT; //[n]; // degré de saturation
+int *Degre; //[n]; // degré des sommets
+bool trouve = false; // permet de stopper l'algorithme exact quand une coloration a été trouvé
 
 
-void genere(int p) // genere un graphe non orientÈ de n sommets et probabilitÈ p d'arÍte entre toute paire de sommets
+
+//DECLARATION DES FONCTIONS
+
+void genere(int p);
+
+bool convient(int x, int c);
+
+bool convientDSAT(int x, int c);
+
+void colorRR(int x, int k);
+
+void colorexact(int k);
+
+int nbChromatique(int d);
+
+int dsatMax();
+
+int DSATUR();
+
+int DSATUR(int k);
+
+int DSATUR2(int k);
+
+int degmoy();
+
+void affichegraphe();
+
+int ColorGlouton();
+
+
+//FONTIONS GLOBALES
+
+void genere(int p) // génère un graphe non orientÈ de n sommets et probabilité p d'arête entre toute paire de sommets
 {
     srand(time(NULL));
     for (int i = 0; i < n - 1; i++) {
@@ -27,7 +63,6 @@ void genere(int p) // genere un graphe non orientÈ de n sommets et probabilitÈ
     }
 }
 
-
 bool convient(int x,
               int c) // teste si la couleur c peut Ítre donnee au sommet x (elle n'est pas utilisee par un de ses voisins)
 {
@@ -35,7 +70,6 @@ bool convient(int x,
         if (adj[x][i] && (couleur1[i] == c)) return false;
     return true;
 }
-
 
 bool convientDSAT(int x, int c) // teste si la couleur c peut Ítre donnee au sommet x - version pour DSATUR
 {
@@ -60,15 +94,13 @@ void colorRR(int x, int k) // fonction recursive pour tester toutes les couleurs
     //return false;
 }
 
-
 void colorexact(int k) // teste si le graphe possede une coloration en k couleurs en essayant toutes les combinaisons
 {
     for (int i = 0; i < n; i++)
         couleur1[i] = 0;
     colorRR(0, k);
-    //if(!trouve) cout << "Pas de coloration en " << k <<" couleurs" << endl;
+    if (!trouve) cout << "Pas de coloration en " << k << " couleurs" << endl;
 }
-
 
 int nbChromatique(
         int d) {// calcule le nombre chromatique en testant ‡ partir de d couleurs et diminuant k tant que c'est possible
@@ -80,7 +112,6 @@ int nbChromatique(
     } while (trouve);
     return k + 1;
 }
-
 
 int dsatMax() {
     int maxDeg = -1, maxDSAT = -1, smax = 0;
@@ -123,7 +154,6 @@ int DSATUR() {
     return cmax;
 }
 
-//DSATUR avec degre d'improprete (DSAT) et degre des sommets (Degre) pour le choix du sommet a colorier (dsatMax) et pour la mise a jour des DSAT
 int DSATUR(int k) {
     int nb = 0, c, x, cmax = 0;
     for (int i = 0; i < n; i++) {
@@ -156,6 +186,41 @@ int DSATUR(int k) {
     return cmax;
 }
 
+void affichegraphe() {
+    for (int i = 0; i < n; i++) {
+        cout << "Sommet " << i << " : ";
+        for (int j = 0; j < n; j++) {
+            if (adj[i][j] == 1) {
+                cout << j << " ";
+            }
+        }
+        cout << endl;
+    }
+}
+
+/**
+int ColorGlouton() {
+    for (int &i: couleur2) {
+        i = 0;
+    }
+    for (int i = 0; i < n; i++) {
+        for (int c = 1; c <= n; c++) {
+            if (convient(i, c)) {
+                couleur2[i] = c;
+                break;
+            }
+        }
+    }
+    int k = 0;
+    for (int i = 0; i < n; i++) {
+        if (couleur2[i] > k) {
+            k = couleur2[i];
+        }
+    }
+    return k;
+}
+*/
+
 int degmoy() {
     float moy = 0, moy_col = 0;
     for (int i = 0; i < n; i++) {
@@ -163,12 +228,9 @@ int degmoy() {
             if (adj[i][j] == 1) {
                 moy_col++;
             }
-//            cout << " " << adj[i][j] << " ";
         }
         moy += (moy_col / n);
-//        cout << endl;
     }
-//    cout << "Degré moyen dans le graphe : " << (moy/(n-1)) << endl;
     return (moy / (n - 1));
 }
 
@@ -211,56 +273,4 @@ int DSATUR2(int k) {
 }
 
 
-int main() {
-    int p, k, nbc;
-
-    srand(time(NULL));
-//    n = ::rand() % 100;
-//    p = ::rand() % 100;
-
-    n = 5;
-    p = 50;
-
-    adj = new int *[n];
-    for (int i = 0; i < n; i++)
-        adj[i] = new int[n];
-    couleur1 = new int[n];
-    couleur2 = new int[n];
-    DSAT = new int[n];
-    Degre = new int[n];
-
-    genere(p);
-
-    cout << "N : " << n << endl;
-    cout << "P : " << p << endl;
-
-//    for (int i = 0; i < n; i++) {
-//        cout << "sommet " << i << " : ";
-//        for (int j = 0; j < n; j++)
-//            if (adj[i][j]) cout << j << " ";
-//        cout << endl;
-//    }
-//
-    k = DSATUR(0);
-    cout << "DSAT : coloration en " << k << " couleurs : " << endl;
-    cout << "DSATUR2 : " << "Nombre de couleurs: " << DSATUR2(2) << endl;
-
-//    for (int i = 0; i  < n; i++)
-//        cout << "couleur de " << i << " : " << couleur2[i] << endl;
-//
-//    cout << "ColorExact :" << endl;
-    nbc = nbChromatique(k);
-    cout << "Nombre chromatique : " << nbc << endl;
-
-
-//    cout << "Degré moyen dans le graphe : [" << degmoy() << "]" << endl;
-
-
-    delete adj;
-    delete couleur2;
-    delete couleur1;
-    delete DSAT;
-    delete Degre;
-
-    return 0;
-}
+#endif //PROJET_HPP

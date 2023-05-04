@@ -1,4 +1,4 @@
 .idea/
 cmake-build-debug/
 CMakeLists.txt
-Code_Max.hpp
+Projet.hpp
