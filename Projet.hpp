@@ -19,8 +19,6 @@ int *DSAT; //[n]; // degré de saturation
 int *Degre; //[n]; // degré des sommets
 bool trouve = false; // permet de stopper l'algorithme exact quand une coloration a été trouvé
 
-
-
 //DECLARATION DES FONCTIONS
 
 void genere(int p);
