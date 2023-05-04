@@ -11,7 +11,11 @@ L'algorithme DSATUR (Degree of the Smallest Adjacent Color plus Saturation) est 
 
 <h2>Execution du code</h2>
 
-COMING SOON
-
+````
+g++ -o exec Projet.cpp 
+````
+````
+./exec 
+````
 ## Conclusion
 Ce projet nous a permis de mieux comprendre le fonctionnement des graphes et de l'algorithme DSATUR en particulier. 
