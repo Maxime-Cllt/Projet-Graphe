@@ -11,10 +11,10 @@ L'algorithme DSATUR (Degree of the Smallest Adjacent Color plus Saturation) est 
 
 <h2>Execution du code</h2>
 
-Pour exécuter le code, il suffit de compiler le fichier "Projet.cpp" en utilisant les commandes suivantes :
+Pour exécuter le programme avec les meilleures performances, compiler le fichier "Projet.cpp" en utilisant les commandes suivantes :
 
 ````
-g++ -o exec Projet.cpp 
+g++ -o exec -O3 Projet.cpp
 ````
 ````
 ./exec 
